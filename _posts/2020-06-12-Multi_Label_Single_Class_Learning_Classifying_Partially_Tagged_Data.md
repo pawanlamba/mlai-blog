@@ -1,15 +1,18 @@
 ---
 layout: post
-title:  "Multi Single Class Learning"
+title:  "Multi Single Class Learning, Classifying Partially Tagged Data"
 author: pawan
 categories: [ Loss Function, Deep Learning ]
 image: assets/images/post_id_20200612/output_4_1.png
 featured: true
 ---
 
-Machine Learning requires large amount of clean data for the models to be trained. But thats rarely the case in reality. A Scenario in real life is clicks/likes data, where a click signifies the customer preference. But this is only positive class and for machine learning we need negative classes too.
+Machine Learning requires large amount of clean data for the models to be trained. 
+But that's rarely the case in reality. A Scenario in real life is clicks/likes data, where a click signifies the customer preference. 
+But this is only positive class and for machine learning we need negative classes too. 
+We often conveniently assume partially tagged information as against the other class. 
 
-This seems like OneVsAll problem at the face of it but its not in the real sense. Because "VsAll" assumes that the sample doesn't belong to other classes. But in our problem statement we may not so clearly seprable classes. So overlapping decision boundaries.
+This seems like OneVsAll problem at the face of it but its not in the real sense, as "VsAll" assumes that the sample doesn't belong to other classes. But in our problem statement we don't have clearly separable classes(instead overlapping decision boundaries).
 
 Lets illustrate it with a data example.
 
@@ -42,7 +45,7 @@ plt.show()
 ![png]({{ site.baseurl }}/assets/images/post_id_20200612/output_4_1.png)
 
 
-This looks like very desirable data with 3 classes really seperable. But we seldom gets data so clean in real life. So lets introduce some confusion with randomly merging class 2 into 0 and 1.
+This looks like very desirable data with 3 really separable classes(Not suited to our problem) hence lets introduce some confusion with randomly merging samples from class 2 into 0 and 1.
 
 
 ```python
@@ -68,7 +71,11 @@ plt.show()
 ![png]({{ site.baseurl }}/assets/images/post_id_20200612/output_6_1.png)
 
 
-This looks like quite a real life scenario. Where the tag says it belongs to this class doesn't mean its not likely to be part of other class. Or often the positive class tags are only collected. Let classify these with deep learning.
+This suits our experiment setup where the label doesn't mean its not likely to be part of other class. 
+In real life use cases we often collect partial positive class labels, with incomplete information. 
+In a click stream data on a product, customer click signifies preference for the product but not otherwise. 
+
+Let attempt to classify our data with existing deep learning methods.
 
 ## Classification Model
 
@@ -268,29 +275,29 @@ for i in range(n_classes):
     Class Idx: 2 [0.49942127, 0.48137274]
 
 
-This also doesn't seem to be solvin the problem, as its classifying it into one of the classes. I ran the experiment twice and it was randomly classifying it into either.
+This also doesn't seem to be solve the problem, as its classifying it into one of the classes. I ran the experiment twice and it was randomly classifying it into either.
 
-## Single(Positive) Class Training.
+## Single(Positive) Class Training
 
-In BinaryCrossEntropy when we are training for the positive label, indirectly we are also training that it doesn't belong to other class. So we need to find a mechanism such a way that we train for only Single Class(Postive), And Hence the title of the document. We have Multiple Labels but data for only single class. 
+BinaryCrossEntropy loss trains for negative classes for every sample of positive label. So we need to find a mechanism such a way that we train for only Single Class(Postive), And Hence the title of the document. We have Multiple Labels but data for only single class. 
 
-Embeddings seems to have an architecture like this, so lets visit a dual model embedding space optimiztion(idea from siamese networks).
+Embeddings seems to have an architecture like this, so lets visit a dual model embedding space optimization(idea from siamese networks).
 
-#### Architecture
-**Left Model**, is a feature generation model. Which takes input and dense layers to generate the represenatation.
+### Architecture
+**Feature Encoder**, is a feature generation model. Which takes input and dense layers to generate the represenatation.
 
-**Right Model** This leg of the model learns Label Embedding.
+**Label Encoder** This leg of the model learns Label Embedding.
 
 **Comparision** This part of the model enables the learning, which tries to minimize the distance(cosine/L2/Any Distance) between the two legs of the model.
 
 
 ```python
-# Left Side Model
+# Feature Encoder Model
 input_left = Input(shape=(n_dim,), name="Input_Left")
 dense_layer = Dense(n_dim,name="Dense_Left")
 dense_1 = dense_layer(input_left)
 
-#Right Side Model
+#Label Encoder Model
 model_n_classes = np.unique(y).shape[0]
 input_right = Input(shape=(1,), name="Input_Right")
 label_embeddings = Embedding(input_dim=model_n_classes, output_dim=n_dim, 
@@ -378,15 +385,15 @@ label_embeddings.weights
 
 
 
-What we are doing above is we are only training with Postive classes. which Says label in class is 1 is close to label in class 0. Hence bring them closer. So the losses benefits by bringing the points closer. But we want an anti force saying that these point should not be closer. 
+What we are doing above is we are only training with Positive classes. which Says sample in class is 1 is close to sample in class 0. Hence bring them closer. So the losses benefits by bringing the label embeddings closer,. But we want an anti force making labels apart. 
 
-Which is generally provided by negative samples and in our data collection mechanism we don't have those. Other alternative is random negative sampling somehting thats done in Word2Vec or other Embeddings. But that would be data corruption.
+Which is generally provided by negative samples and in our experiment we don't have those. Other alternative is random negative sampling similar to Word2Vec or other Embeddings. But that would be data corruption.
 
-So How do I solve for this, problem at hand is the clusters are too near to be distinguished(or practically merged). Label Embeddings weights are also identical(meaning no class difference).
+So How do I solve for this, problem at hand is the clusters are too near to be distinguished(or are practically merged). Label Embeddings weights are also identical(meaning no class difference).
 
-We can add a penality for making the embeddings for the different classes same. Something opposite to what Regularizers do. So lets introduce a anti-regularizer.
+We can add a penality for making the embeddings for the different classes same. Something opposite to what **Regularizers** do. So lets introduce a anti-regularizer.
 
-**Anti-Regularizer** basically rewards the model with far away label embeddings. But far has no limit so we would introduce a constraint on the norm of the weights of Embeddings too
+**Anti-Regularizer** rewards model for separable label embeddings. But separation has no limit, hence we would introduce a constraint on the norm of the weights of Embeddings.
 
 
 ```python
@@ -403,16 +410,16 @@ class AntiRegularizer(tf.keras.regularizers.Regularizer):
         return tf.math.reduce_euclidean_norm(x - W)
 ```
 
-The Above code calculates the distance between the inter label embeddings with negative sign. Also Weight Square is added as limiter. But we would use constraint for the sure shot limitation.
+The Above code calculates the distance between the inter label embeddings with negative sign. Also Weight Square is added as limiter. But we would use constraint for the deterministic limit.
 
 
 ```python
-# Left Side Model
+# Feature Encoder Model
 input_left = Input(shape=(n_dim,), name="Input_Left")
 dense_layer = Dense(n_dim,name="Dense_Left")
 dense_1 = dense_layer(input_left)
 
-#Right Side Model
+#Label Encoder Model
 model_n_classes = np.unique(y).shape[0]
 input_right = Input(shape=(1,), name="Input_Right")
 label_embeddings = Embedding(input_dim=model_n_classes, output_dim=n_dim, 
@@ -516,7 +523,7 @@ label_embeddings.weights
 
 
 
-Above results seems to not merge everything to zero and keep the classes away but does it solve the task of predicting the mixed class among both?? Lets check
+Above results seems to keep the classes separable but does it solve the task of predicting the mixed class among both?? Lets check
 
 
 
@@ -572,9 +579,4 @@ for i in range(n_classes):
 
 In the Above Distribution we clearly see that the average probability score is high for both the classes for Class==2
 
-NOTE: Although L2 Distance doesn't gurantee this probability score demarcation on sigmoid, but with a scale parameter it can always be found.
-
-
-```python
-
-```
+NOTE: Although L2 Distance doesn't guarantee probability score demarcation on sigmoid, but with a scale parameter it can always be learned.

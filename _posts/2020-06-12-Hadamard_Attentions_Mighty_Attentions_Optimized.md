@@ -55,7 +55,7 @@ $$ softmax((W_{attention})_{m \times m}).V$$
 ### Pros
  - Lesser Weights.
  - Faster training.
- - Not Usefull when input independent attention but strictly position dependent attention works fine with this. for example $x_{t+1} = k_0*(x_{t}) + k_1*(x_{t-1}) + k_2*(x_{t-2})$
+ - Not Usefull when input independent attention but strictly position dependent attention works fine with this. for example $x_{t+1} = k_0 * x_{t} + k_1 * x_{t-1} + k_2 * x_{t-2}$
 
 ### Cons
 - Only works when attention is independent of the the input.
