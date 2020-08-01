@@ -7,11 +7,11 @@ image: assets/images/post_id_20200601/attention.png
 featured: true
 ---
 
-Attention is the mightiest layer so far, which symbolizes its parent paper that "Attention is all you need" in true sense. Almost all task, be it images, voice, text, reasoning etc, uses attentions now.
+Attention is the mightiest layer so far, which symbolizes its parent paper that "Attention is all you need" in true sense. Almost all tasks, be it images, voice, text, reasoning, etc, uses attentions now.
 
-But the layer is very heavy with most of STOA tasks taking days to train. Do we really need so much parameters to learn the intuition behind the Attention.
+But the layer is very heavy with most of STOA tasks taking days to train. Do we "really" need so many parameters to learn the intuition behind the Attention?
 
-We discuss this below. and propose a lower rank hadamard attention.
+We discuss this below. and propose a lower Rank Hadamard attention.
 
 ## Attention As Described.
 
@@ -19,11 +19,11 @@ Attention is described in its true form as
 
 $$softmax(Q.K^T).V$$
 
-while its implemented as 
+while it is implemented as 
 
 $$softmax([Q.W_q].[W_k^T.K^T]).[V.W_v]$$
 
-Now if we consider Q, K, V coming from same matrix of size $m x n$ of seq length $m$ and embedding dimension $n$. And we need to assume a dimension of attention projection lets say that is $l$
+Now if we consider Q, K, V coming from the same matrix of size $m x n$ of seq length $m$ and embedding dimension $n$. And we need to assume a dimension of attention projection lets say that is $l$
 
 Now the dimension of the multiplication is as follows
 
@@ -40,11 +40,11 @@ which simplifies to
 
 $$softmax(m \times m).(m \times n).(n \times l)$$
 
-this totals to $3(n \times l)$ weights. 2 times for the softmax part just to estimate a m X m matrix. Which is basically seq_len X seq_len. We don't have to multiply or have so many weights.
+this totals to $3(n \times l)$ weights. 2 times for the softmax part just to estimate a m X m matrix. which is seq_len X seq_len. We don't have to multiply or have so many weights.
 
 ## Fixed Attention.
 
-I propose having a $m \times m$ matrix to estimate attention, which is similar to a feedforward matrix with softmax. Softmax plays the key attention part here to stress on certain inputs. After all this is the intuition behind the attentions.
+I propose having a $m \times m$ matrix to estimate attention, which is similar to a feedforward matrix with softmax. Softmax plays the key attention part here to stress on certain inputs. After all, this is the intuition behind the attentions.
 
 ![Intuition Behind Attention]({{site.baseurl}}/assets/images/post_id_20200601/attention.png)
 
@@ -58,18 +58,18 @@ $$ softmax((W_{attention})_{m \times m}).V$$
  - Not Usefull when input independent attention but strictly position dependent attention works fine with this. for example $x_{t+1} = k_0 * x_{t} + k_1 * x_{t-1} + k_2 * x_{t-2}$
 
 ### Cons
-- Only works when attention is independent of the the input.
-- Not always usefull. except for rearranging the input.
+- Only works when attention is independent of the input.
+- Not always useful. except for rearranging the input.
 
 
 ## Hadamard Attention.
 
-There has been recent work in optimizing attention, [Synthesizer](https://arxiv.org/abs/2005.00743) and [Linformer](https://arxiv.org/abs/2006.04768), proving attention matrix is low rank. Existing work proves low rank and takes a different route to optimize attention we propose replacing dot product attentions(weights heavy) with hadamard attention. 
+There has been recent work in optimizing attention, [Synthesizer](https://arxiv.org/abs/2005.00743) and [Linformer](https://arxiv.org/abs/2006.04768), proving the attention matrix is low rank. Existing work proves low rank and takes a different route to optimize attention we propose replacing dot product attention(weights heavy) with Hadamard attention. 
 
 
 $$ softmax((W_{attention})_{m \times m} * (Q.K^T)_{m \times m}).V$$
 
-Hadamard Attentions is constrained on weights and still input dependent. This optimizes the learning power of model as we are using far less weights than in original version. But do we always need so many weights, we discuss this in the results sections later.
+Hadamard Attentions is constrained on weights and still input dependent. This optimizes the learning power of the model as we are using far fewer weights than in the original version. But do we always need so many weights, we discuss this in the results sections later.
 
 ### Pros
  - Lesser Weights.
@@ -78,16 +78,16 @@ Hadamard Attentions is constrained on weights and still input dependent. This op
 
 ### Cons
 - Assumption here is that $m << n $, if m is comparable to n then $m \times m$ weight matrix can be larger than $n \times n$. And we may have more weights than original attention.
-- Assumption, Heada will take care of alternate attentions represenatations required.
+- The assumption, Head will take care of alternate attentions representations required.
 
 ### Empirical Results
 
 #### Experiment Setup
-For quick analysis we choose a language translation task as setup in the tutorial on tensorflow attentions described [here](https://www.tensorflow.org/tutorials/text/transformer). It set ups a Transformer model to translate Portuguese to English with dot product attentions. We would keep the experiment setup same with changes only in Multi Head Attentions Code.
+For quick analysis, we choose a language translation task as setup in the tutorial on TensorFlow attentions described [here](https://www.tensorflow.org/tutorials/text/transformer). It setups a Transformer model to translate Portuguese to English with dot product attentions. We would keep the experiment setup the same with changes only in Multi-Head Attentions Code.
 
 Existing MultiHeadAttention code snippet from the blog can be found [here](https://www.tensorflow.org/tutorials/text/transformer#multi-head_attention)
 
-We implement a HadamardHead Layer as described below(its a modificaton of the original dense layer).
+We implement a HadamardHead Layer as described below(its a modification of the original dense layer).
 
 ```python
 from tensorflow.python.framework import dtypes
@@ -243,20 +243,20 @@ class MultiHadamardHeadAttention(tf.keras.layers.Layer):
 
 ```
 
-Another change in experment setup is fixed length input.
+Another change in the experiment setup is fixed-length input.
 #### Weights Optimization
 For embedding_size(d_model):512 and seq_len:40 we see a drop in parameter of the model from 1,050,624 to 538,113 which is a 50% drop in parameters. 
 
-We run the experiment for 50 epochs to comapre in loss and accuracy. And the results are as below.
+We run the experiment for 50 epochs to compare in loss and accuracy. And the results are as below.
 
 **Accuracy Comparision:**
 We observer that there is a minimal loss in accuracy as compared to dot product attention. With dot-attention peak accuracy @37.29% hadamard score a 36.30%
 ![Accuracy Comparision Dot Product and Hadamard Attentions]({{site.baseurl}}/assets/images/post_id_20200601/accuracy.svg)
 **Loss Comparision:**
-We see a similar trend in loss, We save 2X in parameter of attention with minimal impact on accuracy and loss. 
+We see a similar trend in loss, We save 2X in the parameter of attention with minimal impact on accuracy and loss. 
 ![Loss Comparision Dot Product and Hadamard Attentions]({{site.baseurl}}/assets/images/post_id_20200601/loss.svg)
 
-We can choose other experiment setup for comparision, but goal of the demonstatration is to show minimal impact in training and saving on paramters.
+We can choose another experiment setup for comparison, but the goal of the demonstration is to show minimal impact in training and saving on parameters.
 
 ## Conclusion
-I am not proposing against dot product attention, instead we can carefully choose one over other when required. Also language models can be trained as mix of Hadamard and Dot Product Attentions.
+I am not proposing against dot product attention, instead, we can carefully choose one over the other when required. Also, language models can be trained as a mix of Hadamard and Dot Product Attentions.

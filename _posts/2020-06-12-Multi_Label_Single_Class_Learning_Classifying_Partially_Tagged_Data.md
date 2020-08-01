@@ -7,14 +7,14 @@ image: assets/images/post_id_20200612/output_4_1.png
 featured: true
 ---
 
-Machine Learning requires large amount of clean data for the models to be trained. 
+Machine Learning requires a large amount of clean data for the models to be trained. 
 But that's rarely the case in reality. A Scenario in real life is clicks/likes data, where a click signifies the customer preference. 
-But this is only positive class and for machine learning we need negative classes too. 
+But this is only a positive class and for machine learning, we need negative classes too. 
 We often conveniently assume partially tagged information as against the other class. 
 
-This seems like OneVsAll problem at the face of it but its not in the real sense, as "VsAll" assumes that the sample doesn't belong to other classes. But in our problem statement we don't have clearly separable classes(instead overlapping decision boundaries).
+This seems like OneVsAll problem at the face of it but it is not in the real sense, as "VsAll" assumes that the sample doesn't belong to other classes. But in our problem statement we don't have clearly separable classes(instead overlapping decision boundaries).
 
-Lets illustrate it with a data example.
+Let us illustrate it with a data example.
 
 
 ```python
@@ -45,7 +45,7 @@ plt.show()
 ![png]({{ site.baseurl }}/assets/images/post_id_20200612/output_4_1.png)
 
 
-This looks like very desirable data with 3 really separable classes(Not suited to our problem) hence lets introduce some confusion with randomly merging samples from class 2 into 0 and 1.
+This looks like very desirable data with 3 separable classes(Not suited to our problem) hence let us introduce some confusion with randomly merging samples from class 2 into 0 and 1.
 
 
 ```python
@@ -71,9 +71,9 @@ plt.show()
 ![png]({{ site.baseurl }}/assets/images/post_id_20200612/output_6_1.png)
 
 
-This suits our experiment setup where the label doesn't mean its not likely to be part of other class. 
-In real life use cases we often collect partial positive class labels, with incomplete information. 
-In a click stream data on a product, customer click signifies preference for the product but not otherwise. 
+This suits our experiment setup where the label doesn't mean it is not likely to be part of the other class. 
+In real-life use cases, we often collect partial positive class labels, with incomplete information. 
+In a clickstream data on a product, customer click signifies a preference for the product but not otherwise. 
 
 Let attempt to classify our data with existing deep learning methods.
 
@@ -177,7 +177,7 @@ for i in range(n_classes):
     Class Idx: 2 [0.59249353, 0.40750644]
 
 
-This clearly has partitioned the class into two. Which is not the intended case, Also it can't be expected from CrossEntropy as it clearly a multi class paritioning loss. Lets try with BinaryCrossEntropy
+This identifiably has partitioned the class into two, which is not the intended case, Also it can't be expected from CrossEntropy as it a multi-class partitioning loss. Let us try with BinaryCrossEntropy
 
 ### BinaryCrossEntopy
 
@@ -275,16 +275,16 @@ for i in range(n_classes):
     Class Idx: 2 [0.49942127, 0.48137274]
 
 
-This also doesn't seem to be solve the problem, as its classifying it into one of the classes. I ran the experiment twice and it was randomly classifying it into either.
+This also doesn't seem to be solving the problem, as it is classifying it into one of the classes. I ran the experiment twice and it was randomly classifying it into either.
 
 ## Single(Positive) Class Training
 
-BinaryCrossEntropy loss trains for negative classes for every sample of positive label. So we need to find a mechanism such a way that we train for only Single Class(Postive), And Hence the title of the document. We have Multiple Labels but data for only single class. 
+BinaryCrossEntropy loss trains for negative classes for every sample of the positive label. So we need to find a mechanism such a way that we train for only Single Class(Positive), And Hence the title of the document. We have Multiple Labels but data only for a single class.   
 
-Embeddings seems to have an architecture like this, so lets visit a dual model embedding space optimization(idea from siamese networks).
+Embeddings seem to have an architecture like this, so let us visit a dual model embedding space optimization(idea from siamese networks).
 
 ### Architecture
-**Feature Encoder**, is a feature generation model. Which takes input and dense layers to generate the represenatation.
+**Feature Encoder**, is a feature generation model. Which takes input and dense layers to generate the representation.
 
 **Label Encoder** This leg of the model learns Label Embedding.
 
@@ -385,13 +385,13 @@ label_embeddings.weights
 
 
 
-What we are doing above is we are only training with Positive classes. which Says sample in class is 1 is close to sample in class 0. Hence bring them closer. So the losses benefits by bringing the label embeddings closer,. But we want an anti force making labels apart. 
+What we are doing above is we are only training with positive classes. that like saying sample in class is 1 is close to sample in class 0. Hence bring them closer. So the losses benefit by bringing the label embeddings closer, But we want an anti force making labels apart. 
 
-Which is generally provided by negative samples and in our experiment we don't have those. Other alternative is random negative sampling similar to Word2Vec or other Embeddings. But that would be data corruption.
+Which is generally provided by negative samples and in our experiment we don't have those. Another alternative is random negative sampling similar to Word2Vec or other Embeddings. But that would be data corruption.
 
-So How do I solve for this, problem at hand is the clusters are too near to be distinguished(or are practically merged). Label Embeddings weights are also identical(meaning no class difference).
+So How do I solve for this, the problem at hand is the clusters are too near to be distinguished(or are practically merged). Label Embeddings weights are also identical(meaning no class difference).
 
-We can add a penality for making the embeddings for the different classes same. Something opposite to what **Regularizers** do. So lets introduce a anti-regularizer.
+We can add a penalty to model for outputting the same embeddings for different classes. Something opposite to what **Regularizers** do. So let us introduce an Anti-Regularizer.
 
 **Anti-Regularizer** rewards model for separable label embeddings. But separation has no limit, hence we would introduce a constraint on the norm of the weights of Embeddings.
 
@@ -410,7 +410,7 @@ class AntiRegularizer(tf.keras.regularizers.Regularizer):
         return tf.math.reduce_euclidean_norm(x - W)
 ```
 
-The Above code calculates the distance between the inter label embeddings with negative sign. Also Weight Square is added as limiter. But we would use constraint for the deterministic limit.
+The Above code calculates the distance between the inter-label embeddings with a negative sign. Also, Weight Square is added as a limiter. But we would use constraint for the deterministic limit.
 
 
 ```python
@@ -523,7 +523,7 @@ label_embeddings.weights
 
 
 
-Above results seems to keep the classes separable but does it solve the task of predicting the mixed class among both?? Lets check
+The above results seem to keep the classes separable but does it solve the task of predicting the mixed class among both?? Let us check
 
 
 
@@ -577,6 +577,6 @@ for i in range(n_classes):
     Class Idx: 2 [0.97378165, 0.98498565]
 
 
-In the Above Distribution we clearly see that the average probability score is high for both the classes for Class==2
+In the Above Distribution, we observe that the average probability score is high for both the classes for Class==2
 
-NOTE: Although L2 Distance doesn't guarantee probability score demarcation on sigmoid, but with a scale parameter it can always be learned.
+NOTE: Although L2 Distance doesn't guarantee probability score demarcation on sigmoid. But with a scale parameter, it can always be learned.

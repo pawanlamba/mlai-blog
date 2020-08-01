@@ -7,15 +7,15 @@ image: assets/images/post_id_20200615/training_setup.svg
 featured: true
 ---
 
-In continuation to my [Partial Tagged Data Classification]({{site.baseurl}}/Multi_Label_Single_Class_Learning_Classifying_Partially_Tagged_Data) post, We formulate a more generic loss function applicabale to all task(classification, metric learning, clustering, ranking etc)
+In continuation to my [Partial Tagged Data Classification]({{site.baseurl}}/Multi_Label_Single_Class_Learning_Classifying_Partially_Tagged_Data) post, We formulate a generic loss function applicable to all task(classification, metric learning, clustering, ranking, etc)
 
-Traditionally we had classification losses like CrossEntropy, Log-Likelihood, MSE, MAE etc. But recently a more general approach for metric learning is famous like [contrasitive loss, Chopra Et al.](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf), [Triplet Loss, Weinberger and Saul](http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf), Margin Loss etc. Recently [Supervised Contrasitive Learning](https://arxiv.org/abs/2004.11362) showed that metric learning can over power classification losses.
+Traditionally we had classification losses like CrossEntropy, Log-Likelihood, MSE, MAE, etc. But recently a more general approach for metric learning is famous like [contrasitive loss, Chopra Et al.](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf), [Triplet Loss, Weinberger and Saul](http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf), Margin Loss, etc. Recently [Supervised Contrastive Learning](https://arxiv.org/abs/2004.11362) showed that metric learning can overpower classification losses.
 
-Traditional Classification losses like crossentropy, log-likelihood modulates feature space representation and are linear classifiers over the resultant space. Hence often assume the a sample belongs to one of the available classes. So not suited for tasks like recommendations, missing link predictions, ranking documents, Embeddings etc.[Reason why metric loss are picking up]. Where sample may belong to other classes too.
+Traditional Classification losses like cross-entropy, log-likelihood modulates feature space representation and are linear classifiers over the resultant space. Hence often assume a sample belongs to one of the available classes. which makes it unsuitable for tasks like recommendations, missing link predictions, ranking documents, Embeddings, etc.[Reason why metric loss is picking up]. Where samples may belong to other classes too.
 
-Metric learning losses assume availability of the contrastive data or rely on the mechanism to carefully sample negative labels. Which could lead to in-efficiencies in the learning process.
+Metric learning losses assume the availability of the contrastive data or rely on the mechanism to carefully sample negative labels. Which could lead to in-efficiencies in the learning process?
  
-We explore a new loss which is free from negative sampling. We propose a Min-Max loss which minimizes a metric between sample and class and maximizes intra-class distance(class separability). Let $C$ be set of classes and $X$ be set of samples.
+We explore a new loss that is free from negative sampling. We propose a Min-Max loss which minimizes a metric between sample and class and maximizes intra-class distance(class separability). Let $C$ be set of classes and $X$ be set of samples.
 
 $$min \sum_{x\in X, c \in C}D(x,c)$$
 
@@ -23,15 +23,15 @@ $$max \sum_{\forall C} D(c_i,c_j)$$
 
 where sample $x$ is tagged to class $c$.
 
-Intutively we are pushing sample close to its class's learned representation and pushing all classess away from each other to maintain seprability.
+Intuitively we are pushing samples close to its class's learned representation and pushing all classes away from each other to maintain separability.
 
 For simplifying it to a minimization problem we can rewrite it as 
 
 $$min \sum_{x\in X, c \in C}D(x,c) - \sum_{\forall C} D(c_i,c_j)$$
 
-We are free to choose any distance convex metric like L2, L1, Cosine Similarity, KL-Divergence etc.
+We are free to choose any distance convex metric like L2, L1, Cosine Similarity, KL-Divergence, etc.
 
-For non probabilitic metrics we need to have a constraint on the $D(c_i,c_j)$ as it can not converge.
+For non-probabilistic metrics, we need to have a constraint on the $D(c_i,c_j)$ as it can not converge.
 
 $$min \sum_{x\in X, c \in C}D(x,c) - \sum_{\forall C} D(c_i,c_j)$$
 
@@ -43,22 +43,22 @@ $$\sum_{\forall C} D(c_i,c_j) < K ... Norm Constraint$$
 
 **Supervised Setup**<br/>
 
-For supervised training we can setup this as either loss from the label embedding layer with constraints in tensorflow. Something we did in the [Partial Tagged Data Classification]({{site.baseurl}}/Multi_Label_Single_Class_Learning_Classifying_Partially_Tagged_Data) post. This could be costly when we have large number of classes. 
+For supervised training, we can set up this as either loss from the label embedding layer with constraints in TensorFlow. Something we did in the [Partial Tagged Data Classification]({{site.baseurl}}/Multi_Label_Single_Class_Learning_Classifying_Partially_Tagged_Data) post. This could be costly when we have a large number of classes. 
 
-Alternate implementation is with negative sampling(not among samples but among classes). 
+An alternate implementation is with negative sampling(not among samples but classes). 
 
 Setup Diagram Below
 
 ![Training SetUp]({{site.baseurl}}/assets/images/post_id_20200615/training_setup.svg)
 
 Where
-- Label Encoder is an Label Embedding Layer.
+- Label Encoder is a Label Embedding Layer.
 - Feat Encoder is a neural network for feature transformations.
-- We Feed postive(1) or negative label(-1) on the respective cosine losses. 
-For other distance metric we can choose according.
+- We Feed positive(1) or negative label(-1) on the respective cosine losses. 
+For other distance metrics, we can choose accordingly.
 
 **Supervised Experiment**
-We keep the data setup same from the previous post and train the model using below code.
+We keep the data setup similar to the previous post and train the model using the below code.
 
 **Goal**: Classify common class as part of both classes.
 
@@ -147,8 +147,8 @@ plt.title("Plot for Class=1")
 
 ![SupervisedPlot]({{site.baseurl}}/assets/images/post_id_20200615/SupervisedPlot.svg)
 
-From the charts we can deduce that the common class in original data(class==2) is included in both label boundaries.
-hence can say goal is accomplished. We have trained a classification model using our loss and successfully avoided wrongly tagging mixed class. 
+From the charts, we can deduce that the common class in original data(class==2) is included in both label boundaries.
+hence can say the goal is accomplished. We have trained a classification model using our loss and successfully avoided wrongly tagging mixed class. 
 
 **Self-Supervised Setup**<br/>
-It demands a section of its own hence we will cover how to use min-max loss for self supervised learning.
+It demands a section of its own hence we will cover how to use the min-max loss for self-supervised learning.
