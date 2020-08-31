@@ -7,8 +7,6 @@ image: assets/images/post_id_20200828/RLDLBlock.svg
 featured: true  
 ---  
 
-# Deep Learning Models are Reinforcement Learning Agents.
-
 Deep learning has reached its heights while Reinforcement learning is yet to find its moment. But today we will take a problem from the famous deep learning space and map it to not so famous RL space. We would explore an alternative version of training the deep learning models and explore how two are trying to solve the same problem.
 
 ## Formulating  a Deep Learning Model Training as RL Problem
@@ -18,7 +16,7 @@ Let us take a deep learning layer from the model and represent it as an RL agent
 
 ![svg]({{site.baseurl}}/assets/images/post_id_20200828/RLDLBlock.svg)
 
-Now each block has a state input $s_t$ from preceding layer and takes an action $s_t$ and maps the states to new state $s_{t+1}$. Each Block is markovian as it depends only on the preceding input and not the history. It is a case of Model Based Reinforcement Learning, but for deep learning blocks we can conveniently assume the ENV to be Identity function.
+Now each block has a state input $s_t$ from preceding layer and takes an action $s_t$ and maps the states to new state $s_{t+1}$. Each Block is markovian as it depends only on the preceding input and not the history. It is a case of Model-Based Reinforcement Learning, but for deep learning blocks, we can conveniently assume the ENV to be the Identity function.
 
 
 To formulate the deep learning training as an RL problem we can draw parallel as per this diagram.
@@ -61,7 +59,7 @@ We can formulate the RL problem as a deep learning problem now. The maze transve
 ### Code Example
 Now let us see how the state space trajectory of a neural network looks with a code example.
 
-We would take a 2 dimensional(for plotting ease) 2 layer output layer with multi-depth(so trajectory is meaningfull) to observe trajectory
+We would take a 2 dimensional(for plotting ease) 2 layer output layer with multi-depth(so the trajectory is meaningful) to observe the trajectory
 
 ```python
 # Neural Network
@@ -166,7 +164,7 @@ plt.show()
 
 ![SVG]({{site.baseurl}}/assets/images/post_id_20200828/StateTrajectories.svg)
 
-This is only indicative as neural networks have multiple solution to the same dataset we can see different trajectories.
-Also since we have increased the depth just for plotting, it is not optimial trajectory path. we can neural network wobbles around in the space.
+This is only indicative as neural networks have multiple solutions to the same dataset we can see different trajectories.
+Also since we have increased the depth just for plotting, it is not the optimal trajectory path. we can see neural network wobbles around in the space.
 
-Solution to the above we will rest for future posts.
+A solution to the above toy problem, we will leave to a future post.
