@@ -1,6 +1,6 @@
 ---  
 layout: post  
-title:  "Dropout And VAE Inherently Enables Contrastive Self Supervised Pretraining"  
+title:  "Dropout Inherently Enables Contrastive Self Supervised Pretraining"  
 author: pawan  
 categories: [Deep Learning, Self Supervised Learning, Pretraining, Dropout, VAE ]  
 image: assets/images/post_id_20210724/Dropout.svg  
@@ -64,8 +64,10 @@ Since representation will be compared with the same label $y_i$ there must exist
   
 $$m_1 \approx m_2 \approx ... \approx m_n$$  
   
-On careful reconsideration, the training process resembles the process of self-supervised training, where we are corrupting the input $X_i$ and then trying to minimize distance or maximize agreement between their representations $m_1, m_2, ... m_n$.  
-  
-Multi-epoch here is just for explanation, to make it more explicit we can up-sample the records and zip them in the same batch. We have used dropout as a layer of corruption, another layer like VAE can replace dropout and without the loss of generality. 
+On careful reassessment, the training process resembles the process of self-supervised training, where we are corrupting the input $X_i$, projecting them to representation space and then trying to minimize distance or maximize agreement between their representations $m_1, m_2, ... m_n$.  
 
-We can conclude that while minimizing the supervised loss, we are simultaneously minimizing the auxiliary self-supervised loss.
+### Conclusion  
+We can conclude that by minimizing the supervised loss, we are simultaneously minimizing the auxiliary self-supervised loss.
+All this achieved without adding any extra flops or weights to the network. 
+
+Multi-epoch here is just for explanation, to make it more explicit we can up-sample the records and zip them in the same batch. We have used dropout as a layer of corruption, other layers like VAE can replace dropout.
