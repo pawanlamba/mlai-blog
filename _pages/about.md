@@ -28,10 +28,21 @@ comments: false
 
 #### Professional Experience
 *Paytm - Noida India*<br/>
-**Senior Manager, Data Science, CDST**, July 2019 – Present<br/>
+**Dy General Manager, Data Science, Collections Lending**, Aug 2021 – Present<br/>
+**Senior Manager, Data Science, Collections Lending**, Aug 2020 – July 2021<br/>
 
-- Mentor and solution a AI assistant project with deep learning based intent identification.
-- Entities and Intent resolution using Deep-NLP based models for real time customers.
+- Built a **Team of 14** comprising of Data Engineers, Analyst and Machine Learning Scientist.
+- Planned and executed, roadmap of **ML and Data infrastructure** for debt collections.
+- Instrumental in designing **strategy** with collection heads for a BNPL product.
+- Spearheaded **Reinforcement Learning** based solution for **automated strategy** driving decisions for **Channels (SMS, OBD, BOT, Call, Push, Chat, Banners, Ads), Allocation , Intensity, Time of Contact, Field, Agent, Content and Language** for 3rd party debt collection.
+- Built **scalable ML infra** for multiple lenders and loan products powering **collections SAAS** product.
+- Designed **ML based Segmentation model pipelines for Pre-Delinquency and Roll-forward pre-GCL** buckets.
+
+**Senior Manager, Data Science, CDST**, July 2019 – July 2020<br/>
+
+- Mentor and solution a **AI Chatbot** project with deep learning based intent identification.
+- **Entities and Intent resolution** using** Deep-NLP** based models for real time customers.
+- Built **Semantic Role Labelling, Language Identification and Sentiment Analysis** for the Chatbot.
 - Exploring Reinforcement learning based AI dialogue manager.
 
 **Senior Manager, Data Science, Paytm Labs Team**, July 2016 – July 2019<br/>
