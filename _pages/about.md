@@ -8,7 +8,7 @@ comments: false
 *A Big-Data Machine learning Data Scientist experienced in domains like NLP, Banking, Marketing, Comparison Shopping, SEM, Channel and Pricing Optimization. Competitive in various tools and  Skills including*
 <table style = "text-align: left; border-collapse: collapse; width: 100%; border: None; font-style: italic;">
     <tr>
-    <td> - Deep <Learning></Learning></td>
+    <td> - Deep Learning</td>
     <td> - Machine Learning</td>
     <td> - Revenue Optimization</td>
     </tr><tr>
